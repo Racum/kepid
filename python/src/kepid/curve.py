@@ -4,13 +4,12 @@ Every formula is evaluated in the order the spec writes it, so encoding is
 bit-exact with other conforming implementations.
 """
 
-from __future__ import annotations
-
 import math
 from dataclasses import dataclass
-from typing import Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import TypeAlias
 
-Layer = Tuple[float, float, float]
+Layer: TypeAlias = tuple[float, float, float]
 
 
 # ---- the functions of section 2 ---------------------------------------------
@@ -84,7 +83,7 @@ def inverse(layers: Sequence[Layer], t: float) -> float:
 # ---- quantizers (section 6) -------------------------------------------------
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Interval:
     """Domain [lo, lo + width]; codes are floor(t N), decoded at the code centre."""
 
@@ -92,30 +91,30 @@ class Interval:
     width: float
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Circular:
     """360 degrees starting at lo; codes are mod(round(t N), N)."""
 
     lo: float
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Signed:
     """Sign and magnitude over |x| <= max, with an exact zero code N/2."""
 
     max: float
 
 
-Kind = Union[Interval, Circular, Signed]
+Kind: TypeAlias = Interval | Circular | Signed
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class FieldMap:
     """One field of the layout: its width, its kind and its curve."""
 
     bits: int
     kind: Kind
-    layers: Tuple[Layer, ...]
+    layers: tuple[Layer, ...]
 
     @property
     def codes(self) -> int:
@@ -123,27 +122,29 @@ class FieldMap:
 
     def encode(self, x: float) -> int:
         n = self.codes
-        kind = self.kind
-        if isinstance(kind, Interval):
-            z = clamp((x - kind.lo) / kind.width, 0.0, 1.0)
-            t = forward(self.layers, z)
-            return int(clamp(math.floor(t * n), 0, n - 1))
-        if isinstance(kind, Circular):
-            z = mod(x - kind.lo, 360.0) / 360.0
-            t = forward(self.layers, z)
-            return int(mod(round_half_away(t * n), n))
-        z = min(abs(x) / kind.max, 1.0)
-        t = math.copysign(forward(self.layers, z), x)
-        return int(clamp(round_half_away((t * n) / 2), -n / 2, n / 2 - 1) + n / 2)
+        match self.kind:
+            case Interval(lo, width):
+                z = clamp((x - lo) / width, 0.0, 1.0)
+                t = forward(self.layers, z)
+                return int(clamp(math.floor(t * n), 0, n - 1))
+            case Circular(lo):
+                z = mod(x - lo, 360.0) / 360.0
+                t = forward(self.layers, z)
+                return int(mod(round_half_away(t * n), n))
+            case Signed(max_):
+                z = min(abs(x) / max_, 1.0)
+                t = math.copysign(forward(self.layers, z), x)
+                return int(clamp(round_half_away((t * n) / 2), -n / 2, n / 2 - 1) + n / 2)
 
     def decode(self, k: int) -> float:
         n = self.codes
-        kind = self.kind
-        if isinstance(kind, Interval):
-            t = clamp((k + 0.5) / n, 0.0, 1.0)
-            return kind.lo + kind.width * inverse(self.layers, t)
-        if isinstance(kind, Circular):
-            t = k / n
-            return kind.lo + 360 * inverse(self.layers, t)
-        t = clamp((k - n / 2) / (n / 2), -1.0, 1.0)
-        return kind.max * math.copysign(inverse(self.layers, abs(t)) - inverse(self.layers, 0.0), t)
+        match self.kind:
+            case Interval(lo, width):
+                t = clamp((k + 0.5) / n, 0.0, 1.0)
+                return lo + width * inverse(self.layers, t)
+            case Circular(lo):
+                t = k / n
+                return lo + 360 * inverse(self.layers, t)
+            case Signed(max_):
+                t = clamp((k - n / 2) / (n / 2), -1.0, 1.0)
+                return max_ * math.copysign(inverse(self.layers, abs(t)) - inverse(self.layers, 0.0), t)

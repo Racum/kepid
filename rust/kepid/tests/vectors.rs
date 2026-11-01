@@ -2,7 +2,7 @@
 
 use kepid::{decode, encode, Elements, KepId};
 
-const VECTORS: &str = include_str!("../../../testdata/profile0_vectors.csv");
+const VECTORS: &str = include_str!("../../../docs/profile0_vectors.csv");
 
 struct Row<'a> {
     case: &'a str,

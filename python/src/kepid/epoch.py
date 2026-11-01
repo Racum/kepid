@@ -1,10 +1,7 @@
 """Exact epoch input and output (``docs/spec.md``, section 7, "Epoch input")."""
 
-from __future__ import annotations
-
 import datetime
 import re
-from typing import Optional
 
 _US_PER_DAY = 86_400_000_000
 # One unit of a TLE epoch's 8-digit day fraction, 10⁻⁸ day, in microseconds.
@@ -17,7 +14,7 @@ def _days(year: int, month: int, day: int) -> int:
     return datetime.date(year, month, day).toordinal() - _UNIX_DAY_ZERO
 
 
-def tle_epoch_unix_us(field: str) -> Optional[int]:
+def tle_epoch_unix_us(field: str) -> int | None:
     """Converts a TLE epoch field, ``YYDDD.DDDDDDDD`` (line 1, columns 19-32),
     to Unix microseconds, exactly.
 
@@ -40,7 +37,7 @@ def tle_epoch_unix_us(field: str) -> Optional[int]:
     return (_days(year, 1, 1) + day - 1) * _US_PER_DAY + units * _US_PER_TLE_DIGIT
 
 
-def tle_epoch_field(unix_us: int) -> Optional[str]:
+def tle_epoch_field(unix_us: int) -> str | None:
     """Formats Unix microseconds as a TLE epoch field, ``YYDDD.DDDDDDDD``,
     rounding to the nearest 10⁻⁸ day (864 µs; a tie rounds up).
 
@@ -59,7 +56,7 @@ def tle_epoch_field(unix_us: int) -> Optional[str]:
 _ISO8601 = re.compile(r"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d*))?Z?", re.ASCII)
 
 
-def iso8601_unix_us(text: str) -> Optional[int]:
+def iso8601_unix_us(text: str) -> int | None:
     """Converts an ISO 8601 UTC date-time, ``YYYY-MM-DDThh:mm:ss[.f…][Z]`` (an
     OMM ``EPOCH``), to Unix microseconds, exactly.
 
@@ -84,7 +81,7 @@ def iso8601_unix_us(text: str) -> Optional[int]:
     return days * _US_PER_DAY + ((h * 60 + minute) * 60 + s) * 1_000_000 + us
 
 
-def omm_epoch(unix_us: int) -> Optional[str]:
+def omm_epoch(unix_us: int) -> str | None:
     """Formats Unix microseconds as ``YYYY-MM-DDThh:mm:ss.ffffff``, the form
     CelesTrak uses for OMM ``EPOCH``. Returns ``None`` outside years 1-9999."""
     days, rem = divmod(unix_us, _US_PER_DAY)

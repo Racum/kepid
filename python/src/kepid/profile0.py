@@ -1,7 +1,5 @@
 """Constants of KepID profile 0 (``docs/spec.md``, sections 3 and 4, and Appendix A)."""
 
-from __future__ import annotations
-
 from .curve import Circular, FieldMap, Interval, Signed
 
 # Epoch: one tick is 256 ms; the field holds 40 bits of ticks.

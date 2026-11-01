@@ -348,7 +348,7 @@ Decoding uses only +, −, ×, ÷, sqrt, abs and copysign: no trigonometry and n
 
 ## 10. Test vectors
 
-`testdata/profile0_vectors.csv` has one row per case: the input element set, the expected KepID, and the decoded element set.
+[`profile0_vectors.csv`](profile0_vectors.csv), next to this document, has one row per case: the input element set, the expected KepID, and the decoded element set.
 
 Columns:
 - `case` and `epoch_utc`;

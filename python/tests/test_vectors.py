@@ -7,7 +7,7 @@ from pathlib import Path
 
 from kepid import Elements, EncodeError, decode, encode
 
-VECTORS = Path(__file__).resolve().parents[2] / "testdata" / "profile0_vectors.csv"
+VECTORS = Path(__file__).resolve().parents[2] / "docs" / "profile0_vectors.csv"
 FLOATS = ["mean_motion", "eccentricity", "inclination", "raan", "arg_perigee", "mean_anomaly", "bstar"]
 
 

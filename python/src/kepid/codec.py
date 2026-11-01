@@ -1,17 +1,15 @@
 """Encoding and decoding (``docs/spec.md``, sections 7 and 8)."""
 
-from __future__ import annotations
-
 import math
 import uuid
 from dataclasses import dataclass
-from typing import Union
+from typing import TypeAlias
 
 from . import profile0 as p
 from .curve import clamp, wrap
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class Elements:
     """SGP4 mean elements, in the units a TLE uses (TEME frame).
 
@@ -43,7 +41,7 @@ class DecodeError(ValueError):
     """The value is not a profile 0 KepID."""
 
 
-KepIdLike = Union[uuid.UUID, str, int]
+KepIdLike: TypeAlias = uuid.UUID | str | int
 
 
 # ---- shared formulas ---------------------------------------------------------
@@ -100,7 +98,7 @@ def _validate(el: Elements) -> float:
     for name in ("mean_motion", "eccentricity", "inclination", "raan", "arg_perigee", "mean_anomaly", "bstar"):
         if not math.isfinite(getattr(el, name)):
             raise EncodeError(f"{name} is not a finite number")
-    if not isinstance(el.epoch_unix_us, int):
+    if not isinstance(el.epoch_unix_us, int) or isinstance(el.epoch_unix_us, bool):
         raise EncodeError("the epoch must be a whole number of microseconds")
     if el.epoch_unix_us < 0:
         raise EncodeError("epoch is before 1970-01-01")
@@ -176,12 +174,13 @@ def encode(el: Elements) -> uuid.UUID:
 
 
 def _as_int(kepid: KepIdLike) -> int:
-    if isinstance(kepid, uuid.UUID):
-        return kepid.int
-    if isinstance(kepid, str):
-        return uuid.UUID(kepid).int
-    if isinstance(kepid, int) and 0 <= kepid < 1 << 128:
-        return kepid
+    match kepid:
+        case uuid.UUID():
+            return kepid.int
+        case str():
+            return uuid.UUID(kepid).int
+        case int() if not isinstance(kepid, bool) and 0 <= kepid < 1 << 128:
+            return kepid
     raise TypeError("a KepID is a uuid.UUID, its text form or a 128-bit integer")
 
 

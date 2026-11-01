@@ -9,7 +9,7 @@ import { EncodeError, decode, encode } from "../src/index.js";
 const FLOATS = { mean_motion: "meanMotion", eccentricity: "eccentricity", inclination: "inclination", raan: "raan", arg_perigee: "argPerigee", mean_anomaly: "meanAnomaly", bstar: "bstar" };
 
 function rows() {
-  const [head, ...lines] = readFileSync(new URL("../../testdata/profile0_vectors.csv", import.meta.url), "utf8").trim().split("\n");
+  const [head, ...lines] = readFileSync(new URL("../../docs/profile0_vectors.csv", import.meta.url), "utf8").trim().split("\n");
   const names = head.split(",");
   return lines.map((line) => Object.fromEntries(line.split(",").map((value, i) => [names[i], value])));
 }

@@ -6,11 +6,8 @@ decimal text, so a value always gets the nearest float. The output matches
 the Rust library character for character.
 """
 
-from __future__ import annotations
-
 import math
 import uuid
-from typing import Optional, Tuple
 
 from .codec import Elements, KepIdLike, decode, encode
 from .epoch import tle_epoch_field, tle_epoch_unix_us
@@ -76,7 +73,7 @@ def tle_to_elements(line1: str, line2: str) -> Elements:
     )
 
 
-def elements_to_tle(el: Elements, catalog: Optional[int] = None) -> Tuple[str, str]:
+def elements_to_tle(el: Elements, catalog: int | None = None) -> tuple[str, str]:
     """Writes mean elements as a TLE, for the object with this NORAD catalog
     number, or with catalog number 00000 when it is ``None``.
 
@@ -115,7 +112,7 @@ def tle_to_kepid(line1: str, line2: str) -> uuid.UUID:
     return encode(tle_to_elements(line1, line2))
 
 
-def kepid_to_tle(kepid: KepIdLike, catalog: Optional[int] = None) -> Tuple[str, str]:
+def kepid_to_tle(kepid: KepIdLike, catalog: int | None = None) -> tuple[str, str]:
     """Decodes a KepID and writes it as a TLE, for the object with this NORAD
     catalog number (0 to 339999; Alpha-5 above 99999), or with 00000 when it
     is ``None``. A KepID describes an orbit, not an object, so the number
@@ -141,7 +138,7 @@ def _checksum(text: str) -> int:
     return sum(int(c) if c.isdigit() else 1 if c == "-" else 0 for c in text) % 10
 
 
-def _read_catalog(text: str) -> Optional[int]:
+def _read_catalog(text: str) -> int | None:
     """Five digits, or Alpha-5: a letter for 10-33, then four digits."""
     text = text.lstrip(" ")
     if not text:
@@ -156,7 +153,7 @@ def _read_catalog(text: str) -> Optional[int]:
     return head * 10_000 + int(digits)
 
 
-def _write_catalog(catalog: int) -> Optional[str]:
+def _write_catalog(catalog: int) -> str | None:
     if 0 <= catalog <= 99_999:
         return f"{catalog:05}"
     if 100_000 <= catalog <= _MAX_CATALOG:
@@ -164,7 +161,7 @@ def _write_catalog(catalog: int) -> Optional[str]:
     return None
 
 
-def _read_exponent(text: str) -> Optional[float]:
+def _read_exponent(text: str) -> float | None:
     """An implied-decimal exponent field: `` 11132-3`` is 0.11132e-3."""
     sign = {" ": "", "+": "", "-": "-"}.get(text[0])
     mantissa, exponent = text[1:6], text[6:8]
@@ -175,7 +172,7 @@ def _read_exponent(text: str) -> Optional[float]:
     return float(f"{sign}0.{mantissa.replace(' ', '0')}e{exponent}")
 
 
-def _write_exponent(x: float) -> Optional[str]:
+def _write_exponent(x: float) -> str | None:
     """Sign, five digits, exponent. Values too small for exponent -9 are
     written as zero."""
     sign = "-" if x < 0 else " "

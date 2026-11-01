@@ -7,11 +7,10 @@ parses numbers exactly, so no extra care is needed there. The output matches
 the Rust library's ``Omm`` key for key.
 """
 
-from __future__ import annotations
-
 import re
 import uuid
-from typing import Any, Dict, Mapping, Optional
+from collections.abc import Mapping
+from typing import Any
 
 from .codec import Elements, KepIdLike, decode, encode
 from .epoch import iso8601_unix_us, omm_epoch
@@ -55,7 +54,7 @@ def omm_to_elements(omm: Mapping[str, Any]) -> Elements:
     )
 
 
-def elements_to_omm(el: Elements, catalog: Optional[int] = None) -> Dict[str, Any]:
+def elements_to_omm(el: Elements, catalog: int | None = None) -> dict[str, Any]:
     """Writes mean elements as an OMM, for the object with this NORAD catalog
     number, or with no ``NORAD_CAT_ID`` when it is ``None``.
 
@@ -68,7 +67,7 @@ def elements_to_omm(el: Elements, catalog: Optional[int] = None) -> Dict[str, An
     epoch = omm_epoch(el.epoch_unix_us)
     if epoch is None:
         raise OmmError(f"epoch {el.epoch_unix_us} µs is past year 9999")
-    omm: Dict[str, Any] = {
+    omm: dict[str, Any] = {
         "CENTER_NAME": "EARTH",
         "REF_FRAME": "TEME",
         "TIME_SYSTEM": "UTC",
@@ -101,7 +100,7 @@ def omm_to_kepid(omm: Mapping[str, Any]) -> uuid.UUID:
     return encode(omm_to_elements(omm))
 
 
-def kepid_to_omm(kepid: KepIdLike, catalog: Optional[int] = None) -> Dict[str, Any]:
+def kepid_to_omm(kepid: KepIdLike, catalog: int | None = None) -> dict[str, Any]:
     """Decodes a KepID and writes it as an OMM, for the object with this NORAD
     catalog number, or with none when it is ``None``. A KepID describes an
     orbit, not an object, so the number comes from the caller."""
@@ -110,12 +109,12 @@ def kepid_to_omm(kepid: KepIdLike, catalog: Optional[int] = None) -> Dict[str, A
 
 def _number(omm: Mapping[str, Any], key: str) -> float:
     """A number, or a string holding one, parsed exactly."""
-    value = omm.get(key)
-    if isinstance(value, bool):
-        value = None
-    if isinstance(value, (int, float)):
-        return float(value)
-    if isinstance(value, str) and _NUMBER.fullmatch(value.strip()):
-        return float(value.strip())
+    match value := omm.get(key):
+        case bool():
+            pass
+        case int() | float():
+            return float(value)
+        case str() if _NUMBER.fullmatch(value.strip()):
+            return float(value.strip())
     raise OmmError(f"{key} is missing or not a number: {value!r}")
 

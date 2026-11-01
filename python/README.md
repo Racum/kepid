@@ -6,7 +6,7 @@ It produces the same KepIDs as the Rust library, bit for bit, and writes the sam
 
 ## Install
 
-Python 3.9 or newer:
+Python 3.11 or newer:
 
 ```bash
 pip install kepid
