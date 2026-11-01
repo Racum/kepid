@@ -1,0 +1,22 @@
+{
+  "name": "kepid",
+  "version": "0.1.0",
+  "description": "KepID: satellite orbits packed into UUIDv7",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./min": "./dist/kepid.min.js"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "npx --yes esbuild@0.28.2 src/index.js --bundle --minify --tree-shaking=true --format=esm --target=es2022 --legal-comments=none --outfile=dist/kepid.min.js",
+    "test": "node --test"
+  }
+}
