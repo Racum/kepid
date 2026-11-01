@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KepID</title>
+  <meta name="description" content="Satellite orbits packed into UUIDv7: convert between KepID, TLE and OMM, and see the bit layout.">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header>
+    <h1>KepID</h1>
+    <p>Satellite orbits packed into UUIDv7</p>
+  </header>
+
+  <main>
+    <div class="input-label">
+      <label for="input">KepID, TLE or OMM (JSON)</label>
+      <button type="button" id="example" class="link">Try the ISS</button>
+    </div>
+    <textarea id="input" rows="5" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" autofocus></textarea>
+
+    <div id="output" aria-live="polite"></div>
+  </main>
+
+  <footer>
+    <p>Everything runs in your browser; nothing is sent anywhere. <a href="https://github.com/racum/kepid">Source and spec on GitHub</a>.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,141 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --surface: #f5f6f7;
+  --text: #1f2328;
+  --muted: #5c6370;
+  --border: #d0d4da;
+  --warning: #8a5a00;
+  --error: #b3261e;
+  --link: #0b63c5;
+  /* One color per field, in its row and in its bits. */
+  --epoch: #00727f;
+  --perigee: #9a3cc0;
+  --inclination: #8a6100;
+  --raan: #1a66c2;
+  --drag: #c62f3b;
+  --lambda: #2c7d32;
+  --motion: #00639b;
+  --eccentricity: #b02a86;
+  --marker: #7b8290;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1d2026;
+    --surface: #262a32;
+    --text: #dcdfe4;
+    --muted: #9aa1ad;
+    --border: #414752;
+    --warning: #e5c07b;
+    --error: #f28b82;
+    --link: #7ab7ff;
+    --epoch: #56b6c2;
+    --perigee: #c678dd;
+    --inclination: #e5c07b;
+    --raan: #61afef;
+    --drag: #e06c75;
+    --lambda: #98c379;
+    --motion: #8be9fd;
+    --eccentricity: #f09ad8;
+    --marker: #8b919c;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0 auto;
+  max-width: 760px;
+  padding: 32px 16px;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+h1 { margin: 0; font: 700 32px/1.2 var(--mono); }
+h2 { margin: 0; font-size: 15px; font-weight: 700; }
+header p { margin: 4px 0 28px; color: var(--muted); }
+a, .link { color: var(--link); }
+
+.input-label, .section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+label { font-weight: 700; font-size: 15px; }
+
+button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+button.link, button.copy { min-height: 24px; text-decoration: underline; }
+button.copy { color: var(--muted); }
+
+textarea {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: 14px/1.5 var(--mono);
+  resize: vertical;
+}
+
+section { margin-top: 24px; }
+
+pre {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font: 13px/1.5 var(--mono);
+}
+
+.warning { margin-top: 24px; color: var(--warning); }
+.warning strong { font-weight: 700; }
+
+.checks { margin: 0; padding-left: 20px; color: var(--error); }
+
+/* The bit layout */
+.card {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font: 13px/1.6 var(--mono);
+}
+.card table { width: 100%; border-collapse: collapse; }
+.card tbody + tbody { border-top: 1px solid var(--border); }
+.card th, .card td { padding: 2px 12px; text-align: left; white-space: nowrap; font-weight: 400; }
+.card tbody tr:first-child > * { padding-top: 10px; }
+.card tbody tr:last-child > * { padding-bottom: 10px; }
+.card tbody > tr > :first-child { width: 1%; border-right: 1px solid var(--border); }
+.card td.bits { white-space: pre; }
+.card .bit-map { border-top: 1px solid var(--border); }
+
+/* Declared after the base rules, so the field color wins on labels and bits. */
+.f-epoch { color: var(--epoch); }
+.f-perigee { color: var(--perigee); }
+.f-inclination { color: var(--inclination); }
+.f-raan { color: var(--raan); }
+.f-drag { color: var(--drag); }
+.f-lambda { color: var(--lambda); }
+.f-motion { color: var(--motion); }
+.f-eccentricity { color: var(--eccentricity); }
+.f-marker { color: var(--marker); }
+
+footer { margin-top: 40px; color: var(--muted); font-size: 14px; }
+footer p { margin: 0; }

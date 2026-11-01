@@ -34,7 +34,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npx --yes esbuild@0.28.2 src/index.js --bundle --minify --tree-shaking=true --format=esm --target=es2022 --legal-comments=none --outfile=dist/kepid.min.js",
+    "build": "npx --yes esbuild@0.28.2 src/index.js --bundle --minify --tree-shaking=true --format=esm --target=es2022 --legal-comments=none --outfile=dist/kepid.min.js && cp dist/kepid.min.js ../online/kepid.min.js",
     "test": "node --test"
   }
 }

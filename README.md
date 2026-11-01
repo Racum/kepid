@@ -17,6 +17,8 @@ becomes this KepID:
 
 Sixteen bytes instead of 140. It sorts by time, it fits in any UUID column, and it decodes back into an orbit you can propagate.
 
+Want to see it for yourself? Play with the [online version](https://racum.blog/kepid): paste a KepID, a TLE or an OMM, and it shows you the other formats and the bit layout.
+
 ---
 
 ## Why?
@@ -137,6 +139,8 @@ Pro tip: if you remember only one thing, remember this: a KepID is a *rounded* o
 ---
 
 ## Library
+
+These are the instructions for Rust; there are also libraries for [Python](python/README.md) and [JavaScript](javascript/README.md), which produce the same KepIDs, bit for bit.
 
 ### Install
 
