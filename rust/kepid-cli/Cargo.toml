@@ -11,4 +11,6 @@ name = "kepid"
 path = "src/main.rs"
 
 [dependencies]
-kepid = { path = "../kepid", version = "0.1.0" }
+kepid = { path = "../kepid", version = "0.1.0", features = ["omm"] }
+serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
+sgp4 = "2"

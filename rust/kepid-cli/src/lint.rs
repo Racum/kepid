@@ -1,5 +1,4 @@
 use std::fmt;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use kepid::profile0::DRAG;
 use kepid::{Fields, KepId};
@@ -23,7 +22,7 @@ pub(crate) enum Severity {
     Error,
 }
 
-/// One result of [`lint`]. Findings are hints, not proof either way.
+/// One result of [`lint_at`]. Findings are hints, not proof either way.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Finding {
     pub severity: Severity,
@@ -46,18 +45,11 @@ fn finding(severity: Severity, code: &'static str, message: String) -> Finding {
     }
 }
 
-/// Checks a KepID for structural and physical problems, using the system clock.
+/// Checks a KepID for structural and physical problems, with "now" in Unix
+/// microseconds.
 ///
 /// Meant to hint that a UUID may be an ordinary timestamp-plus-random UUIDv7
 /// rather than a KepID. An empty result does not prove it is a KepID.
-pub(crate) fn lint(id: KepId) -> Vec<Finding> {
-    let now_us = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |d| d.as_micros() as i64);
-    lint_at(id, now_us)
-}
-
-/// Like [`lint`], with an explicit "now" in Unix microseconds.
 pub(crate) fn lint_at(id: KepId, now_unix_us: i64) -> Vec<Finding> {
     let mut out = Vec::new();
 
@@ -87,7 +79,9 @@ pub(crate) fn lint_at(id: KepId, now_unix_us: i64) -> Vec<Finding> {
         return out;
     }
 
-    let el = crate::unchecked_elements(&fields);
+    let Ok(el) = kepid::decode(id) else {
+        return out;
+    };
 
     // Every decodable value is a closed orbit above the 250 km perigee floor,
     // so what is left are hints of physical implausibility.
