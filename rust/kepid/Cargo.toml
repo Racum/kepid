@@ -1,0 +1,7 @@
+[package]
+name = "kepid"
+description = "KepID: zero-line orbital elements packed into a UUIDv7"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true

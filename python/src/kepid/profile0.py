@@ -1,0 +1,81 @@
+"""Constants of KepID profile 0 (``docs/spec.md``, sections 3 and 4, and Appendix A)."""
+
+from __future__ import annotations
+
+from .curve import Circular, FieldMap, Interval, Signed
+
+# Epoch: one tick is 256 ms; the field holds 40 bits of ticks.
+TICK_US = 256_000
+MAX_EPOCH_TICKS = (1 << 40) - 1
+
+# Physical and derived constants (section 4.1), as the spec's literals.
+MU = 398600.4418
+RE = 6378.137
+R_FLOOR = 6628.137
+TAU = 6.283185307179586
+N_FLOOR = 16.088499719622039
+C_SGP4 = 1.039196724434337
+S_SGP4 = 1.0122292801892716
+G_REF = 50284.883336077255
+D_MAX = 1.0
+
+# Field offsets (bit 0 is the most significant) and widths (section 3).
+EPOCH_BITS = (0, 40)
+ARG_PERIGEE_BITS = (40, 8)
+VERSION_BITS = (48, 4)
+INCLINATION_BITS = (52, 12)
+VARIANT_BITS = (64, 2)
+RAAN_BITS = (66, 14)
+DRAG_BITS = (80, 10)
+PROFILE_BITS = (90, 1)
+LAMBDA_BITS = (91, 13)
+MEAN_MOTION_BITS = (104, 17)
+ECCENTRICITY_BITS = (121, 7)
+
+# Curve layers (a, c, g), Appendix A.
+_ARG_PERIGEE_LAYERS = (
+    (4.083428629e-2, 7.664452626e-1, 3.990766569e-2),
+    (5.507395214e-2, 6.064244552e-2, 1.176634895e-1),
+)
+_INCLINATION_LAYERS = (
+    (1.082992940e-2, 2.953274111e-1, 2.777786713e-4),
+    (1.630044140e-2, 2.363204369e-1, 2.777795907e-4),
+    (6.892137273e-2, 5.603886736e-1, 6.659174209e-3),
+    (4.314797970e-1, 3.784270310e-1, 1.173090567e-1),
+    (2.925692630e-2, 6.592332912e-1, 1.631219892e-3),
+)
+_DRAG_LAYERS = (
+    (9.623760485e-1, 1.589264601e-9, 5.318080922e-2),
+    (2.954822161e-1, 7.986615314e-1, 3.778745014e-2),
+    (1.786089996e-1, 1.116401956e-2, 1.338212342e-2),
+    (8.140581342e-2, 2.365399929e-11, 1.654625459e-2),
+)
+_LAMBDA_LAYERS = (
+    (2.506724280e-3, 5.001930575e-1, 4.161572285e-4),
+    (1.616032485e-1, 5.781309497e-1, 8.902241343e-2),
+    (5.978329411e-2, 4.579863973e-1, 2.595466093e-3),
+    (2.874542339e-2, 9.376973790e-1, 9.133208180e-3),
+    (1.792777376e-2, 9.882822534e-1, 6.059456682e-3),
+)
+_MEAN_MOTION_LAYERS = (
+    (7.894998790e-1, 8.748975979e-1, 6.707300842e-2),
+    (3.912329768e-1, 8.693916408e-1, 1.117938012e-1),
+    (1.953420518e-1, 9.114594208e-1, 4.088966496e-2),
+    (2.833931871e-1, 9.338001081e-1, 1.497879339e-2),
+    (3.233338923e-1, 2.450968642e-2, 3.173610361e-2),
+)
+_ECCENTRICITY_LAYERS = (
+    (4.492276748e-1, 4.502440907e-3, 6.406040192e-2),
+    (6.128914601e-2, 8.756510763e-27, 2.929546956e-2),
+    (8.952636190e-1, 1.000000000e0, 6.953619088e-1),
+    (7.664520029e-2, 9.896597597e-1, 4.532361035e-2),
+)
+
+# Field maps (section 4.2).
+ARG_PERIGEE = FieldMap(8, Circular(lo=0.0), _ARG_PERIGEE_LAYERS)
+INCLINATION = FieldMap(12, Interval(lo=0.0, width=180.0), _INCLINATION_LAYERS)
+RAAN = FieldMap(14, Circular(lo=0.0), ())
+DRAG = FieldMap(10, Signed(max=D_MAX), _DRAG_LAYERS)
+LAMBDA = FieldMap(13, Circular(lo=-180.0), _LAMBDA_LAYERS)
+MEAN_MOTION = FieldMap(17, Interval(lo=0.0, width=1.0), _MEAN_MOTION_LAYERS)
+ECCENTRICITY = FieldMap(7, Interval(lo=0.0, width=1.0), _ECCENTRICITY_LAYERS)
