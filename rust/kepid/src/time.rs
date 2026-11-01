@@ -50,6 +50,69 @@ pub fn tle_epoch_unix_us(field: &str) -> Option<i64> {
     Some((days_from_civil(year, 1, 1) + day - 1) * US_PER_DAY + units * US_PER_TLE_DIGIT)
 }
 
+/// Formats Unix microseconds as a TLE epoch field, `YYDDD.DDDDDDDD`, rounding
+/// to the nearest 10⁻⁸ day (864 µs; a tie rounds up).
+///
+/// Returns `None` outside 1957-2056, the years the two-digit TLE year covers.
+pub(crate) fn tle_epoch_field(unix_us: i64) -> Option<String> {
+    let units = (unix_us.checked_add(US_PER_TLE_DIGIT / 2)?).div_euclid(US_PER_TLE_DIGIT);
+    let units_per_day = US_PER_DAY / US_PER_TLE_DIGIT;
+    let days = units.div_euclid(units_per_day);
+    let (year, _, _) = civil_from_days(days);
+    if !(1957..=2056).contains(&year) {
+        return None;
+    }
+    let day = days - days_from_civil(year, 1, 1) + 1;
+    Some(format!("{:02}{day:03}.{:08}", year % 100, units.rem_euclid(units_per_day)))
+}
+
+/// Converts an ISO 8601 UTC date-time, `YYYY-MM-DDThh:mm:ss[.f…][Z]` (an
+/// OMM `EPOCH`), to Unix microseconds, exactly.
+///
+/// The fraction is read to 6 digits; more digits round to the microsecond on
+/// their decimal digits, halves up (`docs/spec.md`, section 7, "Epoch input").
+/// Returns `None` for anything else, including leap seconds.
+#[cfg_attr(not(feature = "omm"), allow(dead_code))]
+pub(crate) fn iso8601_unix_us(text: &str) -> Option<i64> {
+    let text = text.trim();
+    let text = text.strip_suffix('Z').unwrap_or(text);
+    let (date, time) = text.split_once('T')?;
+    let (clock, fraction) = time.split_once('.').unwrap_or((time, ""));
+    let b = |s: &str, len: usize| s.len() == len && s.bytes().all(|c| c.is_ascii_digit());
+    let (y, rest) = date.split_once('-')?;
+    let (m, d) = rest.split_once('-')?;
+    let mut parts = clock.split(':');
+    let (h, min, s) = (parts.next()?, parts.next()?, parts.next()?);
+    let fields_ok = b(y, 4) && b(m, 2) && b(d, 2) && b(h, 2) && b(min, 2) && b(s, 2);
+    if parts.next().is_some() || !fields_ok || !fraction.bytes().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    let [y, m, d, h, min, s]: [i64; 6] = [y, m, d, h, min, s].map(|v| v.parse().unwrap_or(-1));
+    let leap = y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
+    let month_days = [31, 28 + i64::from(leap), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if !(1..=12).contains(&m) || !(1..=month_days[(m - 1) as usize]).contains(&d) || h > 23 || min > 59 || s > 59 {
+        return None;
+    }
+    let mut us: i64 = format!("{:0<6}", &fraction[..fraction.len().min(6)]).parse().ok()?;
+    if fraction.as_bytes().get(6).is_some_and(|&c| c >= b'5') {
+        us += 1;
+    }
+    Some(days_from_civil(y, m, d) * US_PER_DAY + ((h * 60 + min) * 60 + s) * 1_000_000 + us)
+}
+
+/// Formats Unix microseconds as `YYYY-MM-DDThh:mm:ss.ffffff`, the form
+/// CelesTrak uses for OMM `EPOCH`. Returns `None` past year 9999.
+#[cfg_attr(not(feature = "omm"), allow(dead_code))]
+pub(crate) fn omm_epoch(unix_us: i64) -> Option<String> {
+    let text = iso8601(unix_us);
+    let (y, _, _) = civil_from_days(unix_us.div_euclid(US_PER_DAY));
+    if !(0..=9999).contains(&y) {
+        return None;
+    }
+    let (clock, us) = (&text[..19], unix_us.rem_euclid(1_000_000));
+    Some(format!("{clock}.{us:06}"))
+}
+
 /// Days since 1970-01-01 to (year, month, day), proleptic Gregorian.
 fn civil_from_days(days: i64) -> (i64, i64, i64) {
     let z = days + 719_468;

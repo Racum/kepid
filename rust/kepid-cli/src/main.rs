@@ -1,6 +1,13 @@
+mod explain;
+mod lint;
+#[cfg(test)]
+mod tests;
+
 use std::process::ExitCode;
 
-use kepid::{Elements, KepId, Severity};
+use kepid::{Elements, Fields, KepId};
+
+use lint::Severity;
 
 const USAGE: &str = "\
 usage: kepid <command> <kepid>
@@ -36,11 +43,11 @@ fn main() -> ExitCode {
             }
         },
         "explain" => {
-            print!("{}", kepid::explain(id));
+            print!("{}", explain::explain(id));
             ExitCode::SUCCESS
         }
         "lint" => {
-            let findings = kepid::lint(id);
+            let findings = lint::lint(id);
             for finding in &findings {
                 println!("{finding}");
             }
@@ -66,4 +73,12 @@ fn print_elements(el: &Elements) {
     println!("{:>13}: {:.4}", "arg_perigee", el.arg_perigee);
     println!("{:>13}: {:.4}", "mean_anomaly", el.mean_anomaly);
     println!("{:>13}: {:.4e}", "bstar", el.bstar);
+}
+
+/// Decodes the fields without checking the marker bits, so the diagnostics
+/// also work on values that [`kepid::decode`] refuses. No field value depends
+/// on the markers, so they are forced to valid ones and decoded normally.
+fn unchecked_elements(fields: &Fields) -> Elements {
+    let valid = Fields { profile: 0, ..*fields }.pack();
+    kepid::decode(valid).expect("fields with valid markers always decode")
 }

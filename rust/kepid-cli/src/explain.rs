@@ -1,14 +1,14 @@
-use crate::codec::{drag_factor, elements_from_fields};
-use crate::kepid_id::{Fields, KepId};
-use crate::profile0::*;
+use kepid::drag_factor;
+use kepid::profile0::*;
+use kepid::{Fields, KepId};
 
 /// Describes every field of a KepID: raw code, decoded value, bit position.
 ///
 /// Reads the bits without validating them, so it also works on values that
-/// [`crate::decode`] would refuse.
-pub fn explain(id: KepId) -> String {
+/// [`kepid::decode`] would refuse.
+pub(crate) fn explain(id: KepId) -> String {
     let f = Fields::unpack(id);
-    let el = elements_from_fields(&f);
+    let el = crate::unchecked_elements(&f);
     let w = MEAN_MOTION.decode(f.mean_motion);
     let d = DRAG.decode(f.drag.into());
     let profile = if f.profile == 0 { "profile 0" } else { "reserved" };

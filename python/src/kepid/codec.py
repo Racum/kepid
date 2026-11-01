@@ -118,6 +118,12 @@ def _validate(el: Elements) -> float:
     return w
 
 
+def check_range(el: Elements) -> None:
+    """Checks that an element set can be encoded (section 7, step 1), without
+    encoding it. Raises :class:`EncodeError` if it cannot."""
+    _validate(el)
+
+
 def _tick(epoch_us: int) -> int:
     """Section 7, step 2: the nearest tick, halves rounding up, in integers."""
     return (epoch_us + 128000) // 256000

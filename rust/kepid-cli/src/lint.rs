@@ -1,9 +1,8 @@
 use std::fmt;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use crate::codec::elements_from_fields;
-use crate::kepid_id::{Fields, KepId};
-use crate::profile0::DRAG;
+use kepid::profile0::DRAG;
+use kepid::{Fields, KepId};
 
 /// Mean altitude below which a zero B* is implausible, km.
 const NO_DRAG_BELOW_KM: f64 = 450.0;
@@ -15,7 +14,7 @@ const HIGH_BSTAR: f64 = 1e-3;
 const FUTURE_SLACK_US: i64 = 86_400_000_000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Severity {
+pub(crate) enum Severity {
     /// Odd, but not evidence of anything.
     Info,
     /// Physically unlikely; the value may not be a KepID.
@@ -26,7 +25,7 @@ pub enum Severity {
 
 /// One result of [`lint`]. Findings are hints, not proof either way.
 #[derive(Debug, Clone, PartialEq)]
-pub struct Finding {
+pub(crate) struct Finding {
     pub severity: Severity,
     /// Stable machine-readable identifier.
     pub code: &'static str,
@@ -51,7 +50,7 @@ fn finding(severity: Severity, code: &'static str, message: String) -> Finding {
 ///
 /// Meant to hint that a UUID may be an ordinary timestamp-plus-random UUIDv7
 /// rather than a KepID. An empty result does not prove it is a KepID.
-pub fn lint(id: KepId) -> Vec<Finding> {
+pub(crate) fn lint(id: KepId) -> Vec<Finding> {
     let now_us = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_or(0, |d| d.as_micros() as i64);
@@ -59,7 +58,7 @@ pub fn lint(id: KepId) -> Vec<Finding> {
 }
 
 /// Like [`lint`], with an explicit "now" in Unix microseconds.
-pub fn lint_at(id: KepId, now_unix_us: i64) -> Vec<Finding> {
+pub(crate) fn lint_at(id: KepId, now_unix_us: i64) -> Vec<Finding> {
     let mut out = Vec::new();
 
     if id.version() != 7 {
@@ -88,7 +87,7 @@ pub fn lint_at(id: KepId, now_unix_us: i64) -> Vec<Finding> {
         return out;
     }
 
-    let el = elements_from_fields(&fields);
+    let el = crate::unchecked_elements(&fields);
 
     // Every decodable value is a closed orbit above the 250 km perigee floor,
     // so what is left are hints of physical implausibility.

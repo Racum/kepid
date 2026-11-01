@@ -6,23 +6,26 @@
 //!
 //! Encoding rounds each field to its code, no propagation and no fit; the only
 //! adjustment is moving the mean argument of latitude to the rounded epoch.
-//! TLE/OMM conversion is not implemented yet, apart from the exact TLE epoch
-//! ([`tle_epoch_unix_us`]).
+//! TLEs are read and written as text ([`from_tle`], [`to_tle`],
+//! [`Elements::from_tle`], [`Elements::to_tle`]). With the `omm` feature, OMMs
+//! are read and written as a serde struct (`Omm`, `from_omm`, `to_omm`).
 
 mod codec;
 pub mod curve;
 mod elements;
 mod error;
-mod explain;
 mod kepid_id;
-mod lint;
+#[cfg(feature = "omm")]
+mod omm;
 pub mod profile0;
 mod time;
+mod tle;
 
 pub use codec::{decode, drag_factor, encode, w_of_mean_motion};
 pub use elements::{check_range, Elements};
 pub use error::{DecodeError, EncodeError, ParseError};
-pub use explain::explain;
 pub use kepid_id::{Fields, KepId};
-pub use lint::{lint, lint_at, Finding, Severity};
+#[cfg(feature = "omm")]
+pub use omm::{from_omm, to_omm, to_omm_for, Omm, OmmError};
 pub use time::tle_epoch_unix_us;
+pub use tle::{from_tle, to_tle, to_tle_for, TleError};

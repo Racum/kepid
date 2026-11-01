@@ -1,7 +1,12 @@
-mod common;
+use kepid::{encode, Elements, Fields, KepId};
 
-use common::*;
-use kepid::{encode, lint_at, Elements, Fields, Finding, KepId, Severity};
+use crate::explain::explain;
+use crate::lint::{lint_at, Finding, Severity};
+
+/// The spec's example: the ISS element set of `base`.
+const ISS_ID: &str = "01a17b91-23e2-73ab-813c-86cddaf3a10c";
+/// Its decoded epoch, the nearest 256 ms tick: 2026-10-27T04:14:31.680Z.
+const ISS_EPOCH_US: i64 = 1_793_074_471_680_000;
 
 const NOW: i64 = ISS_EPOCH_US + 3_600_000_000;
 
@@ -15,6 +20,36 @@ fn lint_elements(x: Elements) -> Vec<Finding> {
 
 fn codes(findings: &[Finding]) -> Vec<&'static str> {
     findings.iter().map(|f| f.code).collect()
+}
+
+/// The ISS element set of the spec's test vectors.
+fn base() -> Elements {
+    Elements {
+        epoch_unix_us: 1_793_074_471_558_560,
+        mean_motion: 15.49073103,
+        eccentricity: 0.0006948,
+        inclination: 51.6336,
+        raan: 6.9404,
+        arg_perigee: 314.9066,
+        mean_anomaly: 45.1358,
+        bstar: 0.00011132,
+    }
+}
+
+/// Small deterministic generator, so sweeps are reproducible without a crate.
+struct Rng(u64);
+
+impl Rng {
+    fn new(seed: u64) -> Self {
+        Self(seed)
+    }
+
+    fn next_u64(&mut self) -> u64 {
+        self.0 ^= self.0 << 13;
+        self.0 ^= self.0 >> 7;
+        self.0 ^= self.0 << 17;
+        self.0
+    }
 }
 
 #[test]
@@ -121,7 +156,7 @@ fn display_mentions_severity_and_code() {
 
 #[test]
 fn explain_describes_every_field() {
-    let text = kepid::explain(id(ISS_ID));
+    let text = explain(id(ISS_ID));
     for needle in [ISS_ID, "2026-10-27T04:14:31.680Z", "profile 0", "51.6162 deg", "n = 15.49074945 rev/day", "e = 0.0006626", "B* = 1.1417e-4", "Ω = 6.9434 deg", "perigee"] {
         assert!(text.contains(needle), "missing {needle:?} in\n{text}");
     }
@@ -131,11 +166,11 @@ fn explain_describes_every_field() {
 fn explain_never_panics_on_arbitrary_bits() {
     let mut rng = Rng::new(99);
     for v in [0u128, u128::MAX] {
-        assert!(!kepid::explain(KepId::from_u128(v)).is_empty());
+        assert!(!explain(KepId::from_u128(v)).is_empty());
     }
     for _ in 0..2000 {
         let v = (u128::from(rng.next_u64()) << 64) | u128::from(rng.next_u64());
-        let _ = kepid::explain(KepId::from_u128(v));
+        let _ = explain(KepId::from_u128(v));
         let _ = lint_at(KepId::from_u128(v), NOW);
     }
 }
