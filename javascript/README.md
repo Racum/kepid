@@ -1,6 +1,6 @@
 # KepID for JavaScript
 
-Satellite orbits packed into UUIDv7, in plain JavaScript: no dependencies, an ES module that runs in Node.js 18+, Deno, Bun and browsers. This is the JavaScript version of the KepID library; for what KepID is and why, start with the [main README](../README.md), and for every rule and constant, the [spec](../docs/spec.md).
+Satellite orbits packed into UUIDv7, in plain JavaScript: no dependencies, an ES module that runs in Node.js 18+, Deno, Bun and browsers. This is the JavaScript version of the KepID library; for what KepID is and why, start with the [main README](https://github.com/racum/kepid), and for every rule and constant, the [spec](https://github.com/racum/kepid/blob/main/docs/spec.md).
 
 It produces the same KepIDs as the Rust and Python libraries, bit for bit, and writes the same TLEs and OMMs, character for character.
 
@@ -126,4 +126,4 @@ try {
 
 ## License
 
-[MIT](../LICENSE).
+[MIT](https://github.com/racum/kepid/blob/main/LICENSE).

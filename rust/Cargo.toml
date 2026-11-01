@@ -6,4 +6,7 @@ members = ["kepid", "kepid-cli"]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
+authors = ["Ronaldo Ferreira <ronaldo@racum.com>"]
+homepage = "https://github.com/racum/kepid"
 repository = "https://github.com/racum/kepid"
+keywords = ["uuid", "satellite", "orbit", "tle", "ephemeris"]

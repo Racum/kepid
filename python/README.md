@@ -1,6 +1,6 @@
 # KepID for Python
 
-Satellite orbits packed into UUIDv7, in pure Python: no dependencies, just the standard library. This is the Python version of the KepID library; for what KepID is and why, start with the [main README](../README.md), and for every rule and constant, the [spec](../docs/spec.md).
+Satellite orbits packed into UUIDv7, in pure Python: no dependencies, just the standard library. This is the Python version of the KepID library; for what KepID is and why, start with the [main README](https://github.com/racum/kepid), and for every rule and constant, the [spec](https://github.com/racum/kepid/blob/main/docs/spec.md).
 
 It produces the same KepIDs as the Rust library, bit for bit, and writes the same TLEs and OMMs, character for character.
 
@@ -115,4 +115,4 @@ except TleError as e:
 
 ## License
 
-[MIT](../LICENSE).
+[MIT](https://github.com/racum/kepid/blob/main/LICENSE).

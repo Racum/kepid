@@ -1,4 +1,4 @@
-// KepID: satellite orbits packed into UUIDv7.
+// KepID: Satellite orbits packed into UUIDv7.
 //
 // A KepID holds an SGP4 mean element set (the content of a TLE or an OMM) in
 // one 128-bit value shaped like a UUIDv7. It describes an orbit, not an

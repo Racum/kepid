@@ -1,0 +1,2 @@
+# Reads docs/profile0_vectors.csv at the repository root, outside this package.
+exclude tests/test_vectors.py

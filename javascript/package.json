@@ -1,7 +1,22 @@
 {
   "name": "kepid",
   "version": "0.1.0",
-  "description": "KepID: satellite orbits packed into UUIDv7",
+  "description": "Satellite orbits packed into UUIDv7",
+  "keywords": [
+    "geo",
+    "uuid",
+    "satellite",
+    "orbit",
+    "tle",
+    "ephemeris"
+  ],
+  "author": "Ronaldo Ferreira <ronaldo@racum.com>",
+  "homepage": "https://github.com/racum/kepid",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/racum/kepid",
+    "directory": "javascript"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {

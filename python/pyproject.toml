@@ -5,11 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kepid"
 version = "0.1.0"
-description = "KepID: zero-line orbital elements packed into a UUIDv7"
+description = "Satellite orbits packed into UUIDv7"
 readme = "README.md"
 license = { text = "MIT" }
+authors = [{ name = "Ronaldo Ferreira", email = "ronaldo@racum.com" }]
+keywords = ["geo", "uuid", "satellite", "orbit", "tle", "ephemeris"]
 requires-python = ">=3.11"
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/racum/kepid"
+Repository = "https://github.com/racum/kepid"
 
 [tool.setuptools.packages.find]
 where = ["src"]

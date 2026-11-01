@@ -1,10 +1,16 @@
 [package]
 name = "kepid"
-description = "KepID: zero-line orbital elements packed into a UUIDv7"
+description = "Satellite orbits packed into UUIDv7"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+authors.workspace = true
+homepage.workspace = true
 repository.workspace = true
+keywords.workspace = true
+readme = "README.md"
+# Reads docs/profile0_vectors.csv at the repository root, outside this crate.
+exclude = ["tests/vectors.rs"]
 
 [features]
 # OMM support: the `Omm` struct, with serde Serialize/Deserialize.
