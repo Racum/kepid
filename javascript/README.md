@@ -7,10 +7,10 @@ It produces the same KepIDs as the Rust and Python libraries, bit for bit, and w
 ## Install
 
 ```bash
-npm install kepid
+npm install @racum/kepid
 ```
 
-There is also a single-file, minified build, `dist/kepid.min.js` (about 13 KB, 6 KB gzipped), with the same exports. Import it as `kepid/min`, or drop the file next to a web page:
+There is also a single-file, minified build, `dist/kepid.min.js` (about 13 KB, 6 KB gzipped), with the same exports. Import it as `@racum/kepid/min`, or drop the file next to a web page:
 
 ```html
 <script type="module">
@@ -27,7 +27,7 @@ To rebuild it after changing the source, run `npm run build` (it uses esbuild th
 Turning the ISS TLE from the main README into a KepID, and back:
 
 ```js
-import { kepIdToTle, tleToKepId } from "kepid";
+import { kepIdToTle, tleToKepId } from "@racum/kepid";
 
 const line1 = "1 25544U 98067A   26305.20860139  .00006903  00000+0  13267-3 0  9994";
 const line2 = "2 25544  51.6332 342.0408 0007056 334.5041  25.5599 15.49138562592994";
@@ -57,7 +57,7 @@ Notice that the TLE that comes back is not the one that went in: every element i
 An OMM is a plain object, the shape `JSON.parse` gives for CelesTrak's or Space-Track's JSON (numbers can be numbers or strings):
 
 ```js
-import { kepIdToOmm, ommToKepId } from "kepid";
+import { kepIdToOmm, ommToKepId } from "@racum/kepid";
 
 const omm = JSON.parse(`{
   "EPOCH": "2026-11-01T05:00:23.160096",
@@ -87,7 +87,7 @@ The long tails of digits are just the exact centre of each code; don't read them
 Under the hood, both formats go through the elements: a plain object with the mean element set in TLE units.
 
 ```js
-import { decode, encode } from "kepid";
+import { decode, encode } from "@racum/kepid";
 
 const el = decode("01a1957a-ebef-73ab-bccf-878de5f3a90d");
 console.log(el.epochUnixUs, el.meanMotion, el.inclination);
@@ -111,7 +111,7 @@ Important: `epochUnixUs` is a `BigInt` of Unix microseconds, not a `Number`. The
 | `DecodeError` | Not a KepID: wrong version, variant or profile bits |
 
 ```js
-import { TleError, tleToKepId } from "kepid";
+import { TleError, tleToKepId } from "@racum/kepid";
 
 const line1 = "1 25544U 98067A   26305.20860139  .00006903  00000+0  13267-3 0  9995";
 const line2 = "2 25544  51.6332 342.0408 0007056 334.5041  25.5599 15.49138562592994";

@@ -1,5 +1,5 @@
 {
-  "name": "kepid",
+  "name": "@racum/kepid",
   "version": "0.1.0",
   "description": "Satellite orbits packed into UUIDv7",
   "keywords": [
@@ -29,6 +29,9 @@
   ],
   "engines": {
     "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "npx --yes esbuild@0.28.2 src/index.js --bundle --minify --tree-shaking=true --format=esm --target=es2022 --legal-comments=none --outfile=dist/kepid.min.js",
