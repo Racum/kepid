@@ -45,7 +45,7 @@ KepID is built for three situations, basically:
 Plus a few bonuses:
 
 - **The whole UUID ecosystem, for free.** Every language and every database already knows how to parse, store, compare and index a UUID; no new library needed just to move KepIDs around.
-- **Time extraction with the usual functions.** Any tool that reads a UUIDv7 timestamp gives you the epoch, to within half a second (the last few milliseconds of that timestamp actually hold ω).
+- **Time extraction with the usual functions.** Any tool that reads a UUIDv7 timestamp gives you the epoch, to within half a second (the last 8 bits of that timestamp actually hold ω).
 - **Cache and deduplication keys.** The same element set always gives the same KepID.
 - **Traceability.** One field in a log says which orbit was used.
 - **Links and small payloads.** The 36-character text fits a URL or a QR code, and it can get even shorter with [Uuid25](https://github.com/uuid25) (25 characters) or [shortuuid](https://github.com/skorokithakis/shortuuid) (22).
@@ -54,7 +54,7 @@ Plus a few bonuses:
 
 **Important:** KepID is lossy and not unique, by design!
 
-- **Lossy:** every element is rounded to a code. For the busy 400–600 km shell, the extra error is a median of about **0.6 km after 24 hours**. For comparison, SGP4 itself is commonly quoted at about 1 km at the epoch, growing 1–3 km a day, so KepID's share is small once you look past the epoch. Higher orbits get coarser steps.
+- **Lossy:** every element is rounded to a code. For the busy 400–600 km shell, the extra error is a median of about **0.6 km after 24 hours**. For comparison, SGP4 itself is commonly quoted at about 1 km at the epoch, growing 1–3 km a day, so KepID's share is small once you look past the epoch. Higher orbits get coarser steps. Curious how that plays out over a week? There's a [comparison against real ephemerides](docs/deviation.md).
 - **Not unique:** a KepID describes an orbit, not an object. It carries no catalog number, and two element sets that round alike get the same KepID.
 - **Not a UUIDv7 "in spirit":** it has the right version and variant bits, so all the UUID tooling works, but nothing in it is random, and its timestamp is the element set's epoch, not a creation time. Never use it where a UUIDv7's uniqueness or creation time matters.
 - **Limits:** orbits with a perigee below 250 km can't be encoded, and neither can epochs before 1970.
@@ -106,6 +106,10 @@ Notice that the epoch sits exactly where a UUIDv7 keeps its timestamp: that's wh
 ```
 TTTTTTTT-TTOO-VIII-*AAA-DD*LLLNNNN*E
 ```
+
+A UUIDv7 timestamp takes 48 bits, in 1 ms ticks, but an epoch in 256 ms ticks only needs 40 of them, so KepID steals the other 8 for ω. A generic UUIDv7 reader still gets a valid timestamp, just up to 255 ms past the epoch. In the worst case that's about 1.9 km of travel on a typical sun-synchronous orbit. That only skews the timestamp, not the orbit: a KepID decoder uses the tick, with λ adjusted to match it, so the real error stays at the 0.6 km median from above:
+
+![The first digits of a KepID, read as a UUIDv7 timestamp and as an SGP4 epoch, with the 8 bits they don't share used for perigee](assets/stolen_bits.svg)
 
 ### The technique
 
